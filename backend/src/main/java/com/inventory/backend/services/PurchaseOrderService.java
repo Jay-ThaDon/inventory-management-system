@@ -21,6 +21,7 @@ public class PurchaseOrderService {
     private final ProductRepository productRepository;
     private final SupplierRepository supplierRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public PurchaseOrderResponse createOrder(PurchaseOrderRequest request, String email) {
         Product product = productRepository.findById(request.getProductId())
@@ -69,6 +70,28 @@ public class PurchaseOrderService {
                     product.getQuantityInStock() + order.getQuantity()
             );
             productRepository.save(product);
+
+            notificationService.sendNotificationToUser(
+                    order.getRaisedBy().getId(),
+                    "Your order for " + order.getQuantity() + "x " +
+                            product.getName() + " has been delivered and stock updated."
+            );
+
+            if (product.getQuantityInStock() <= product.getMinimumThreshold()) {
+                notificationService.broadcastToAll(
+                        "Low stock alert: " + product.getName() +
+                                " is below minimum threshold."
+                );
+            }
+        }
+
+        if (PurchaseOrder.Status.valueOf(status) == PurchaseOrder.Status.APPROVED ||
+                PurchaseOrder.Status.valueOf(status) == PurchaseOrder.Status.REJECTED) {
+            notificationService.sendNotificationToUser(
+                    order.getRaisedBy().getId(),
+                    "Your purchase order for " + order.getProduct().getName() +
+                            " has been " + status.toLowerCase() + "."
+            );
         }
 
         return mapToResponse(purchaseOrderRepository.save(order));
