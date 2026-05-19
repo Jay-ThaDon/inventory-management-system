@@ -11,9 +11,20 @@ const api = axios.create({
 // Request interceptor to add the auth token to every request
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      try {
+        // Parse the Zustand storage JSON string
+        const parsedData = JSON.parse(authStorage);
+        // Extract the token field from the nested state object
+        const token = parsedData.state?.token;
+        
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.error("Error parsing auth-storage token:", error);
+      }
     }
     return config;
   },
