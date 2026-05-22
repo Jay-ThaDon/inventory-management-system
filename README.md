@@ -14,22 +14,24 @@ Built with Java (Spring Boot), React, TypeScript, PostgreSQL, and Spring Securit
 ---
 
 ## 🏗️ System Architecture
+```text
 ┌─────────────────────────────────────────────────────────┐
 │                    React Frontend                       │
 │     (Vite + TypeScript + Zustand Client Auth State)     │
 └────────────────────────────┬────────────────────────────┘
-│ Secure HTTP / REST
-▼
+                             │ Secure HTTP / REST
+                             ▼
 ┌─────────────────────────────────────────────────────────┐
 │                 Spring Boot API Service                 │
 │     (Spring Security + Stateless JWT Interceptors)      │
 └────────────────────────────┬────────────────────────────┘
-│ PostgreSQL Dialect
-▼
+                             │ PostgreSQL Dialect
+                             ▼
 ┌─────────────────────────────────────────────────────────┐
 │                    Cloud Database                       │
 │      (Supabase Hosted PostgreSQL Data Instance)        │
 └─────────────────────────────────────────────────────────┘
+```
 
 The application leverages a decoupled structural design. The React client-side portal safely manages authentication token payloads within an encrypted Zustand container state, dispatching them through an automated Axios request interceptor pipeline. The Spring Boot kernel intercepts incoming request schemas, validates the stateless JSON Web Tokens, and proxies the query execution requests directly down to a hosted Supabase PostgreSQL cluster.
 
@@ -61,6 +63,7 @@ The application leverages a decoupled structural design. The React client-side p
 ---
 
 ## 📁 Project Structure
+```text
 inventory-management-system/
 ├── backend/                        # Java Spring Boot API Application
 │   ├── src/
@@ -74,15 +77,16 @@ inventory-management-system/
 │   │       └── application.properties
 │   └── pom.xml
 └── frontend/                       # React TypeScript Web Application
-├── src/
-│   ├── api/                    # Axios Central Network Services
-│   │   └── axios.ts            # Custom JWT Storage Extractor Interceptor
-│   ├── components/             # Global Modular UI Components
-│   ├── pages/
-│   │   └── dashboard/          # UI Workspaces (Admin, Procurement, Warehouse)
-│   └── types/                  # Core TypeScript Struct Configurations
-├── index.html
-└── package.json
+    ├── src/
+    │   ├── api/                    # Axios Central Network Services
+    │   │   └── axios.ts            # Custom JWT Storage Extractor Interceptor
+    │   ├── components/             # Global Modular UI Components
+    │   ├── pages/
+    │   │   └── dashboard/          # UI Workspaces (Admin, Procurement, Warehouse)
+    │   └── types/                  # Core TypeScript Struct Configurations
+    ├── index.html
+    └── package.json
+```
 
 ---
 
@@ -127,6 +131,7 @@ CREATE TABLE purchase_orders (
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
 );
 ```
+---
 
 **###2. Backend API Setup**
 Navigate into your system server subdirectory and establish your target context credentials:
@@ -143,6 +148,8 @@ application.security.jwt.expiration=86400000
 
 Execute the initialization script:
 ./mvnw spring-boot:run
+
+---
 
 **###3. Frontend Portal Setup**
 Navigate into the structural client web directory, fetch dependency packages, and initialize the local loop server node:
