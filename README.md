@@ -133,7 +133,7 @@ CREATE TABLE purchase_orders (
 ```
 ---
 
-**###2. Backend API Setup**
+# 2. Backend API Setup
 Navigate into your system server subdirectory and establish your target context credentials:
 cd backend
 
@@ -151,7 +151,7 @@ Execute the initialization script:
 
 ---
 
-**###3. Frontend Portal Setup**
+# 3. Frontend Portal Setup
 Navigate into the structural client web directory, fetch dependency packages, and initialize the local loop server node:
 cd frontend
 npm install
