@@ -14,8 +14,23 @@ Built with Java (Spring Boot), React, TypeScript, PostgreSQL, and Spring Securit
 ---
 
 ## 🏗️ System Architecture
+┌─────────────────────────────────────────────────────────┐
+│                    React Frontend                       │
+│     (Vite + TypeScript + Zustand Client Auth State)     │
+└────────────────────────────┬────────────────────────────┘
+│ Secure HTTP / REST
+▼
+┌─────────────────────────────────────────────────────────┐
+│                 Spring Boot API Service                 │
+│     (Spring Security + Stateless JWT Interceptors)      │
+└────────────────────────────┬────────────────────────────┘
+│ PostgreSQL Dialect
+▼
+┌─────────────────────────────────────────────────────────┐
+│                    Cloud Database                       │
+│      (Supabase Hosted PostgreSQL Data Instance)        │
+└─────────────────────────────────────────────────────────┘
 
-┌─────────────────────────────────────────────────────────┐│                    React Frontend                       ││     (Vite + TypeScript + Zustand Client Auth State)     │└────────────────────────────┬────────────────────────────┘│ Secure HTTP / REST▼┌─────────────────────────────────────────────────────────┐│                 Spring Boot API Service                 ││     (Spring Security + Stateless JWT Interceptors)      │└────────────────────────────┬────────────────────────────┘│ PostgreSQL Dialect▼┌─────────────────────────────────────────────────────────┐│                    Cloud Database                       ││      (Supabase Hosted PostgreSQL Data Instance)        │└─────────────────────────────────────────────────────────┘
 The application leverages a decoupled structural design. The React client-side portal safely manages authentication token payloads within an encrypted Zustand container state, dispatching them through an automated Axios request interceptor pipeline. The Spring Boot kernel intercepts incoming request schemas, validates the stateless JSON Web Tokens, and proxies the query execution requests directly down to a hosted Supabase PostgreSQL cluster.
 
 ---
@@ -46,8 +61,29 @@ The application leverages a decoupled structural design. The React client-side p
 ---
 
 ## 📁 Project Structure
+inventory-management-system/
+├── backend/                        # Java Spring Boot API Application
+│   ├── src/
+│   │   ├── main/java/com/inventory/
+│   │   │   ├── config/             # Security & JWT Interceptor Configurations
+│   │   │   ├── controllers/        # REST Controller Exposure Gateways
+│   │   │   ├── models/             # Relational Table Entity Mappings
+│   │   │   ├── repositories/       # JPA Database Query Abstraction Layers
+│   │   │   └── services/           # Underlying Business Operational Logic
+│   │   └── resources/
+│   │       └── application.properties
+│   └── pom.xml
+└── frontend/                       # React TypeScript Web Application
+├── src/
+│   ├── api/                    # Axios Central Network Services
+│   │   └── axios.ts            # Custom JWT Storage Extractor Interceptor
+│   ├── components/             # Global Modular UI Components
+│   ├── pages/
+│   │   └── dashboard/          # UI Workspaces (Admin, Procurement, Warehouse)
+│   └── types/                  # Core TypeScript Struct Configurations
+├── index.html
+└── package.json
 
-inventory-management-system/├── backend/                        # Java Spring Boot API Application│   ├── src/│   │   ├── main/java/com/inventory/│   │   │   ├── config/             # Security & JWT Interceptor Configurations│   │   │   ├── controllers/        # REST Controller Exposure Gateways│   │   │   ├── models/             # Relational Table Entity Mappings│   │   │   ├── repositories/       # JPA Database Query Abstraction Layers│   │   │   └── services/           # Underlying Business Operational Logic│   │   └── resources/│   │       └── application.properties│   └── pom.xml└── frontend/                       # React TypeScript Web Application├── src/│   ├── api/                    # Axios Central Network Services│   │   └── axios.ts            # Custom JWT Storage Extractor Interceptor│   ├── components/             # Global Modular UI Components│   ├── pages/│   │   └── dashboard/          # UI Workspaces (Admin, Procurement, Warehouse)│   └── types/                  # Core TypeScript Struct Configurations├── index.html└── package.json
 ---
 
 ## 💻 Running Locally
@@ -90,17 +126,91 @@ CREATE TABLE purchase_orders (
     raised_by BIGINT,
     created_at TIMESTAMP WITHOUT TIME ZONE DEFAULT NOW()
 );
-2. Backend API SetupNavigate into your system server subdirectory and establish your target context credentials:Bashcd backend
-Configure your src/main/resources/application.properties parameters:Propertiesspring.datasource.url=jdbc:postgresql://localhost:5432/inventory_db
+```
+
+**###2. Backend API Setup**
+Navigate into your system server subdirectory and establish your target context credentials:
+cd backend
+
+Configure your src/main/resources/application.properties parameters:
+spring.datasource.url=jdbc:postgresql://localhost:5432/inventory_db
 spring.datasource.username=your_db_user
 spring.datasource.password=your_db_password
 
 # JWT Token Secret Security Configurations
 application.security.jwt.secret-key=your_64_character_hexadecimal_secret_key_string
 application.security.jwt.expiration=86400000
-Execute the initialization script:Bash./mvnw spring-boot:run
-3. Frontend Portal SetupNavigate into the structural client web directory, fetch dependency packages, and initialize the local loop server node:Bashcd frontend
+
+Execute the initialization script:
+./mvnw spring-boot:run
+
+**###3. Frontend Portal Setup**
+Navigate into the structural client web directory, fetch dependency packages, and initialize the local loop server node:
+cd frontend
 npm install
-Create a local environment configuration script file (.env):Code snippetVITE_API_URL=http://localhost:8080
-Fire up the development server:Bashnpm run dev
-The interactive graphical control layout will instantiate locally at http://localhost:5173.📡 Core API Endpoints🔐 Authentication ContextMethodTarget Resource StringAction DescriptionPOST/api/auth/registerSigns up a new enterprise user profilePOST/api/auth/loginValidates credentials and yields a verification JWT📦 Material Asset RoutingMethodTarget Resource StringAction DescriptionGET/api/productsRetrieves full stock arrays with low-stock status evaluationsPOST/api/productsProvisions a new product tracking entityPUT/api/products/{id}Updates details or baseline threshold numbers🏢 Vendor Supply DistributionMethodTarget Resource StringAction DescriptionGET/api/suppliersPulls catalog array profiles for active global vendorsPOST/api/suppliersAdds a new distributor vendor entry profile📋 Procurement & Logistic WorkflowsMethodTarget Resource StringAction DescriptionGET/api/ordersCompiles an exhaustive log history map of all system purchase ordersPOST/api/ordersInitiates a new purchase requisition with a PENDING flag statusPUT/api/orders/{id}/statusPromotes order states (APPROVED / REJECTED / DELIVERED)☁️ Deployment Environment ConfigurationCloud Provider Resource AllocationRender (Backend API Framework Node): Serves the active JAR package runtime engine environment.Vercel (Frontend Web User Portal Client): Processes static assets, UI modules, and dynamic state interactions.Supabase (Relational Database Cluster Core): Exposes a cloud-native PostgreSQL data node enforcing strict entity constraints.Mandatory Remote Environment MapsRender (API Component Engine Variables)SPRING_DATASOURCE_URL = jdbc:postgresql://your-supabase-connection-string:5432/postgres?sslmode=requireSPRING_DATASOURCE_USERNAME = [Your Supabase Database Username Profile]SPRING_DATASOURCE_PASSWORD = [Your Supabase Database Target Password Key String]APPLICATION_SECURITY_JWT_SECRET_KEY = [Your Cryptographic Verification Key Hash String]Vercel (Web Client System Variables)VITE_API_URL = https://inventory-management-backend-lcvk.onrender.com💡 Engineering InsightsStateless Persistence Storage Safeguards: Because user authorization payloads run through a Zustand state configuration layer, the Axios connection wrapper utilizes detailed JSON.parse sequence try-catch scopes to read the auth-storage schema key out of browser cache containers securely without breaking active network processes.Constraint Execution Barriers: Relational query mappings are bound via atomic subqueries, forcing structural dependency integrity that blocks orphans or untracked product entries from infiltrating the live production database.Render Free-Tier Spin-Down Constraints: The application runs on a cost-effective cloud resource tier. Because of this architectural behavior, inactive container execution drops to a standby sleep frame. The initial entry connection call may consume 30 to 50 seconds to complete an environment cold start. Subsequent interactions evaluate within low-latency operational thresholds.
+
+Create a local environment configuration script file (.env):
+VITE_API_URL=http://localhost:8080
+
+Fire up the development server:
+npm run dev
+
+The interactive graphical control layout will instantiate locally at http://localhost:5173.
+
+---
+
+## 📡 Core API Endpoints
+
+### 🔐 Authentication Context
+| Method | Target Resource String | Action Description |
+| :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Signs up a new enterprise user profile |
+| `POST` | `/api/auth/login` | Validates credentials and yields a verification JWT |
+
+### 📦 Material Asset Routing
+| Method | Target Resource String | Action Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/products` | Retrieves full stock arrays with low-stock status evaluations |
+| `POST` | `/api/products` | Provisions a new product tracking entity |
+| `PUT` | `/api/products/{id}` | Updates details or baseline threshold numbers |
+
+### 🏢 Vendor Supply Distribution
+| Method | Target Resource String | Action Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/suppliers` | Pulls catalog array profiles for active global vendors |
+| `POST` | `/api/suppliers` | Adds a new distributor vendor entry profile |
+
+### 📋 Procurement & Logistic Workflows
+| Method | Target Resource String | Action Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/orders` | Compiles an exhaustive log history map of all system purchase orders |
+| `POST` | `/api/orders` | Initiates a new purchase requisition with a `PENDING` flag status |
+| `PUT` | `/api/orders/{id}/status` | Promotes order states (`APPROVED` / `REJECTED` / `DELIVERED`) |
+
+---
+
+## ☁️ Deployment Environment Configuration
+
+### Cloud Provider Resource Allocation
+* **Render (Backend API Framework Node):** Serves the active JAR package runtime engine environment. 
+* **Vercel (Frontend Web User Portal Client):** Processes static assets, UI modules, and dynamic state interactions.
+* **Supabase (Relational Database Cluster Core):** Exposes a cloud-native PostgreSQL data node enforcing strict entity constraints.
+
+### Mandatory Remote Environment Maps
+
+#### Render (API Component Engine Variables)
+* `SPRING_DATASOURCE_URL` = `jdbc:postgresql://your-supabase-connection-string:5432/postgres?sslmode=require`
+* `SPRING_DATASOURCE_USERNAME` = `[Your Supabase Database Username Profile]`
+* `SPRING_DATASOURCE_PASSWORD` = `[Your Supabase Database Target Password Key String]`
+* `APPLICATION_SECURITY_JWT_SECRET_KEY` = `[Your Cryptographic Verification Key Hash String]`
+
+#### Vercel (Web Client System Variables)
+* `VITE_API_URL` = `https://inventory-management-backend-lcvk.onrender.com`
+
+---
+
+## 💡 Engineering Insights
+
+* **Stateless Persistence Storage Safeguards:** Because user authorization payloads run through a Zustand state configuration layer, the Axios connection wrapper utilizes detailed `JSON.parse` sequence try-catch scopes to read the `auth-storage` schema key out of browser cache containers securely without breaking active network processes.
+* **Constraint Execution Barriers:** Relational query mappings are bound via atomic subqueries, forcing structural dependency integrity that blocks orphans or untracked product entries from infiltrating the live production database.
+* **Render Free-Tier Spin-Down Constraints:** The application runs on a cost-effective cloud resource tier. Because of this architectural behavior, inactive container execution drops to a standby sleep frame. The initial entry connection call may consume 30 to 50 seconds to complete an environment cold start. Subsequent interactions evaluate within low-latency operational thresholds.
